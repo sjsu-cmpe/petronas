@@ -12,6 +12,8 @@ import java.util.List;
 import com.tdfs.fs.io.DiskPersistence;
 import com.tdfs.fs.metanode.element.FSMetadata;
 import com.tdfs.fs.metanode.element.File;
+import com.tdfs.fs.scheduler.AbstractScheduler;
+import com.tdfs.fs.scheduler.MetadataSnapshot;
 import com.tdfs.ipc.element.DataPacket;
 import com.tdfs.ipc.element.PacketType;
 import com.tdfs.ipc.event.DataEvent;
@@ -21,13 +23,12 @@ import com.tdfs.ipc.io.AbstractServer;
 //TODO: Change the structure of the inheritance. Try Event-Driven design
 public class MetaNode extends AbstractServer{
 	
-	private MetadataHandler handler;
 	public FSMetadata metadata;
 	private DataEvent dataEvent = null;
 	private SocketEventHandler socketEventHandler = null;
 	private FileWriteHandler fileWriteHandler = null;
 	private FileReadHandler fileReadHandler = null;
-	
+	private AbstractScheduler scheduler = null;
 	
 	
 	
@@ -45,6 +46,7 @@ public class MetaNode extends AbstractServer{
 		System.out.println("Entering Initialization mode");
 		metadata = FSMetadata.getInstance();
 		registerEventHandlers();
+		scheduler = new MetadataSnapshot(3000, 3000);
 				
 	}
 	

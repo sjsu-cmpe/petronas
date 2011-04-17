@@ -1,4 +1,4 @@
-package com.tdfs.fs;
+package com.tdfs.fs.scheduler;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -7,10 +7,10 @@ public abstract class AbstractScheduler extends TimerTask {
 
 	Timer timer;
 	
-	public AbstractScheduler()
+	public AbstractScheduler(long initialDelay,long scheduledDelay)
 	{
 		timer = new Timer();
-		timer.schedule(this, 1000, 1000);
+		timer.schedule(this, initialDelay, scheduledDelay);
 	}
 	
 	@Override

@@ -1,4 +1,4 @@
-package com.tdfs.fs;
+package com.tdfs.fs.scheduler;
 
 import com.tdfs.fs.io.DiskPersistence;
 import com.tdfs.fs.metanode.element.FSMetadata;
@@ -6,9 +6,15 @@ import com.tdfs.fs.util.ResourceLoader;
 
 public class MetadataSnapshot extends AbstractScheduler {
 
+	public MetadataSnapshot(long initialDelay,long scheduledDelay)
+	{
+		super(initialDelay, scheduledDelay);
+	}
+	
 	@Override
 	public void startTimedJob() {
-		// TODO Auto-generated method stub
+		
+		persistMetadataSnapshot();
 		
 
 	}

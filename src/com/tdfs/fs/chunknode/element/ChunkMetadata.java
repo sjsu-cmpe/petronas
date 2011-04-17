@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import com.tdfs.fs.io.DiskPersistence;
+import com.tdfs.fs.util.ResourceLoader;
 
 public class ChunkMetadata implements Serializable{
 	
@@ -54,7 +55,7 @@ public class ChunkMetadata implements Serializable{
 	{
 		DiskPersistence<Set<String>> diskPersistence = new DiskPersistence<Set<String>>();
 		
-		return diskPersistence.readObjectFromDisk("/home/gisripa/Project/DFS/chunknode1/blk_list");
+		return diskPersistence.readObjectFromDisk(ResourceLoader.getChunkLocation()+"chunk_list");
 		
 		
 	}

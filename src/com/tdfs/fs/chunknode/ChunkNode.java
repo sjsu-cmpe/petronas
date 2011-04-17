@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.tdfs.fs.chunknode.element.ChunkMetadata;
 import com.tdfs.fs.io.DiskPersistence;
+import com.tdfs.fs.scheduler.AbstractScheduler;
+import com.tdfs.fs.scheduler.ChunkdataSnapshot;
 import com.tdfs.fs.util.ResourceLoader;
 import com.tdfs.ipc.element.DataPacket;
 import com.tdfs.ipc.element.PacketType;
@@ -30,6 +32,7 @@ public class ChunkNode extends AbstractServer{
 	private ChunkWriteHandler chunkWriteHandler = null;
 	private ChunkReadHandler chunkReadHandler = null;
 	private ChunkMetadata chunkInfo = null;
+	private AbstractScheduler scheduler = null;
 	
 	public ChunkNode(InetAddress host, int port)
 	{
@@ -44,6 +47,7 @@ public class ChunkNode extends AbstractServer{
 		chunkInfo = ChunkMetadata.getInstance();
 		registerEventHandlers();
 		registerWithMetaNode();
+		scheduler = new ChunkdataSnapshot(3000, 3000);
 	}
 	
 	private void registerEventHandlers()
