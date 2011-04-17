@@ -5,11 +5,15 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Observer;
 
+import org.apache.log4j.Logger;
+
 import com.tdfs.ipc.element.DataPacket;
 
 public abstract class AbstractEventListener implements Observer{
 	
 	private ObjectOutputStream outStream;
+	
+	private static Logger logger = Logger.getLogger(AbstractEventListener.class);
 	
 	public AbstractEventListener()
 	{
@@ -26,17 +30,20 @@ public abstract class AbstractEventListener implements Observer{
 		}
 		catch(IOException ioe)
 		{
-			//TODO: Exception handling and loggin
-			ioe.printStackTrace();
+			logger.error("Exception occurred in sending response in AbstractEventListener", ioe);
 		}
 		finally{
-			try {
-				outStream.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			
+			closeStream();
+		}
+	}
+	
+	private void closeStream()
+	{
+		try {
+			outStream.close();
+		} catch (IOException e) {
+			logger.error("Exception occurred in closing the stream in AbstractEventListener", e);
 		}
 	}
 }

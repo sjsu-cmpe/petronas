@@ -87,7 +87,6 @@ public abstract class AbstractServer implements IPCServer {
 		}
 		catch(Exception e)
 		{
-			//e.printStackTrace();
 			logger.error("Exception in Run method of AbstractServer", e);
 		}
 		finally{
@@ -96,8 +95,7 @@ public abstract class AbstractServer implements IPCServer {
 					incomingData.close();
 								
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("Exception occurred in closing the stream", e);
 			}
 		}
 		

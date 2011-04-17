@@ -38,7 +38,7 @@ public class ChunkNode extends AbstractServer{
 	
 	private static Logger logger = Logger.getLogger(ChunkNode.class);
 	
-	
+	// System.out
 	public ChunkNode(InetAddress host, int port)
 	{
 		super.startServer(host, port);

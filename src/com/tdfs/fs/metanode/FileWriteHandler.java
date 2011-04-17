@@ -104,7 +104,7 @@ public class FileWriteHandler extends AbstractEventListener{
 		{
 			file.setBlockList(chunkNames);
 			metadata.updateFileMetadata(file.getFileName(), file);
-			System.out.println("File creation completed-->"+file.toString());
+			logger.info("File creation completed-->"+file.toString());
 			//TODO: Checksum check before sending else throw exception
 			sendChunks();
 			file = null;

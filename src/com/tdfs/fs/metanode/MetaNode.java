@@ -19,7 +19,6 @@ import com.tdfs.fs.scheduler.MetadataSnapshot;
 import com.tdfs.ipc.element.DataPacket;
 import com.tdfs.ipc.element.PacketType;
 import com.tdfs.ipc.event.DataEvent;
-import com.tdfs.ipc.io.AbstractDataHandler;
 import com.tdfs.ipc.io.AbstractServer;
 
 //TODO: Change the structure of the inheritance. Try Event-Driven design

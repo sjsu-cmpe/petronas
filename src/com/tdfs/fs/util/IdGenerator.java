@@ -14,9 +14,5 @@ public class IdGenerator {
 		
 	}
 	
-	public static void main(String...args)
-	{
-		System.out.println(IdGenerator.getId(new String("Gireesh").getBytes()));
-	}
 
 }
