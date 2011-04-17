@@ -15,6 +15,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
 import com.tdfs.fs.chunknode.element.ChunkMetadata;
 import com.tdfs.fs.io.DiskPersistence;
 import com.tdfs.fs.scheduler.AbstractScheduler;
@@ -34,6 +36,9 @@ public class ChunkNode extends AbstractServer{
 	private ChunkMetadata chunkInfo = null;
 	private AbstractScheduler scheduler = null;
 	
+	private static Logger logger = Logger.getLogger(ChunkNode.class);
+	
+	
 	public ChunkNode(InetAddress host, int port)
 	{
 		super.startServer(host, port);
@@ -52,7 +57,7 @@ public class ChunkNode extends AbstractServer{
 	
 	private void registerEventHandlers()
 	{
-		System.out.println("Registering event handlers");
+		logger.debug("Registering Event Handlers for ChunkNode...");
 		this.dataEvent = new DataEvent();
 		this.chunkWriteHandler = new ChunkWriteHandler();
 		this.chunkReadHandler = new ChunkReadHandler();
@@ -73,7 +78,8 @@ public class ChunkNode extends AbstractServer{
 	{
 	
 		// TODO: First register with meta node and then send chunks
-		System.out.println("Registering Chunk Node with Meta Node...");
+		logger.info("Registering Chunk Node with Meta Node");
+		
 		try{
 			ExecutorService pool = Executors.newFixedThreadPool(2);
 			AbstractClient client = new ChunkClient(InetAddress.getByName("localhost"), 9090, 
@@ -81,23 +87,24 @@ public class ChunkNode extends AbstractServer{
 					ResourceLoader.getLocalChunkNodeAddress()));
 			client.initiateConnection();
 			Future<DataPacket<?>> future = pool.submit(client);
-			
-			if(future.get().getPacketType() == PacketType.ACKNOWLEDGEMENT)
+			DataPacket<?> dataPacket = future.get();
+			if(dataPacket != null)
 			{
-				System.out.println("Block list sent to metanode");
+				if(dataPacket.getPacketType() == PacketType.ACKNOWLEDGEMENT)
+				{
+					logger.info("Acknowledgement From MetaNode -->"+dataPacket.getData());
+				}
 			}
+			
 			
 		}
 		catch(UnknownHostException uhe)
 		{
-			//TODO: handle properly
-			uhe.printStackTrace();
+			logger.error("Exception occurred in registering ChunkNode",uhe);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Exception occurred in registering ChunkNode",e);
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Exception occurred in registering ChunkNode",e);
 		}
 		
 		
@@ -113,8 +120,7 @@ public class ChunkNode extends AbstractServer{
 		}
 		catch(Exception e)
 		{
-			//TODO: Error Handling and Loggin
-			e.printStackTrace();
+			logger.error("Exception in starting ChunkNode",e);
 		}
 	}
 

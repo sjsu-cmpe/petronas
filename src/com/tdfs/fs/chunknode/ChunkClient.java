@@ -17,15 +17,15 @@ public class ChunkClient extends AbstractClient {
 	
 	@Override
 	public DataPacket<?> call() throws Exception {
-		// TODO Auto-generated method stub
+		
 
 		this.sendMessage(this.dataPacket);
 		
 		DataPacket<String> incomingPacket = (DataPacket<String>) this.responseHandler();
-		if(incomingPacket!=null)
+		/*if(incomingPacket!=null)
 		{
 			System.out.println(incomingPacket.getData());
-		}
+		}*/
 		return incomingPacket;
 	}
 

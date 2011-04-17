@@ -9,6 +9,8 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.tdfs.fs.io.DiskPersistence;
 import com.tdfs.fs.metanode.element.FSMetadata;
 import com.tdfs.fs.metanode.element.File;
@@ -30,7 +32,7 @@ public class MetaNode extends AbstractServer{
 	private FileReadHandler fileReadHandler = null;
 	private AbstractScheduler scheduler = null;
 	
-	
+	private static Logger logger = Logger.getLogger(MetaNode.class);
 	
 	public MetaNode(InetAddress host,int port)
 	{
@@ -42,8 +44,7 @@ public class MetaNode extends AbstractServer{
 	
 	private void initMetaNode()
 	{
-		//TODO: Remove sysout
-		System.out.println("Entering Initialization mode");
+		logger.info("Entering Initialization Mode...");
 		metadata = FSMetadata.getInstance();
 		registerEventHandlers();
 		scheduler = new MetadataSnapshot(3000, 3000);
@@ -52,6 +53,7 @@ public class MetaNode extends AbstractServer{
 	
 	private void registerEventHandlers()
 	{
+		logger.debug("Registering Event Handlers for MetaNode...");
 		this.dataEvent = new DataEvent();
 		this.socketEventHandler = new SocketEventHandler();
 		this.fileWriteHandler = new FileWriteHandler();

@@ -30,7 +30,7 @@ public class ChunkWriteHandler extends AbstractEventListener {
 				writeChunk();
 				sendResponse(event.getEventSocket(), 
 						new DataPacket<String>(PacketType.ACKNOWLEDGEMENT, 
-								"Chunk persisted", System.currentTimeMillis(), null));
+								"Chunk"+this.chunk.getChunkFileName()+ "persisted", System.currentTimeMillis(), null));
 				chunkInfo = ChunkMetadata.getInstance();
 				chunkInfo.add(chunk.getChunkFileName());
 			}

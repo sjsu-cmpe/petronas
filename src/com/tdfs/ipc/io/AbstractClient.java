@@ -11,6 +11,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.tdfs.interfaces.ipc.IPCClient;
 import com.tdfs.ipc.element.DataPacket;
 import com.tdfs.ipc.element.PacketType;
@@ -23,6 +25,7 @@ public abstract class AbstractClient implements IPCClient{
 	private InetAddress host;
 	private int port;
 	
+	private static Logger logger = Logger.getLogger(AbstractClient.class);
 	
 	protected AbstractClient(InetAddress host,int port)
 	{
@@ -36,14 +39,11 @@ public abstract class AbstractClient implements IPCClient{
 		
 		try{
 			requestSocket = new Socket(this.host,this.port);
-			//requestSocket.bind(new InetSocketAddress(9191));
-			//TODO: LOGGING
-			System.out.println(new StringBuilder("Connected to -->").append(host).append(",").append(port));
+			logger.info(new StringBuilder("Connected to -->").append(host).append(",").append(port));
 		}
 		catch(IOException ioe)
 		{
-			//TODO: Exception Handling and Loggin
-			ioe.printStackTrace();
+			logger.error("Exception occurred in initiating Client Connection", ioe);
 		}
 		
 		
@@ -75,8 +75,7 @@ public abstract class AbstractClient implements IPCClient{
 			outgoingData.flush();
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Exception occurred while sending Message to Server",e);
 		}
 	}
 	
@@ -84,21 +83,21 @@ public abstract class AbstractClient implements IPCClient{
 	public DataPacket<?> responseHandler()
 	{
 		
-		try{
+		DataPacket<?> dataPacket = null;
+ 		try{
 			incomingData = new ObjectInputStream(requestSocket.getInputStream());
-			return (DataPacket<?>) incomingData.readObject();
+			dataPacket = (DataPacket<?>) incomingData.readObject();
 		}
 		catch(IOException ioe)
 		{
-			ioe.printStackTrace();
-			return null;
+			logger.error("Exception occurred while handling response from Server", ioe);
+			
 			
 		} catch (ClassNotFoundException e) {
-			// TODO EXCEPTION HANDLING AND LOGGIN
-			e.printStackTrace();
-			return null;
+			logger.error("Exception while casting class to DataPacket<?>", e);
+			
 		}
-		
+		return dataPacket;
 	}
 	
 	

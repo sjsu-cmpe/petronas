@@ -140,7 +140,7 @@ public class FSMetadata implements Serializable{
 	}
 	
 	//TODO: Fix the algorithm to retrieve available node for chunk
-	public InetSocketAddress getChunkNode(InetSocketAddress sourceNode, String chunkName)
+	public InetSocketAddress getChunkNode(String chunkName)
 	{
 		
 		InetSocketAddress availableNode = null;

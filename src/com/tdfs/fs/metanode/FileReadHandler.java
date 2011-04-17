@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 
+import org.apache.log4j.Logger;
+
 import com.tdfs.fs.metanode.element.FSMetadata;
 import com.tdfs.fs.metanode.element.File;
 import com.tdfs.ipc.element.DataPacket;
@@ -25,6 +27,8 @@ public class FileReadHandler extends AbstractEventListener {
 	private Socket responseSocket = null;
 	private Map<String, InetSocketAddress> chunkMap = null;
 	String fileName;
+	
+	private static Logger logger = Logger.getLogger(FileReadHandler.class);
 	
 	public FileReadHandler()
 	{
@@ -56,10 +60,10 @@ public class FileReadHandler extends AbstractEventListener {
 		file = metadata.getFileMetadata(fileName);
 		file.getBlockList();
 		List<String> chunkNames = file.getBlockList();
-		System.out.println(chunkNames.toString());
+		logger.debug("Chunk List Retrieved -->"+chunkNames.toString());
 		for(String chunkName : chunkNames)
 		{
-			chunkMap.put(chunkName, metadata.getChunkNode(null, chunkName));
+			chunkMap.put(chunkName, metadata.getChunkNode(chunkName));
 		}
 	}
 	

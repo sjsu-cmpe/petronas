@@ -167,8 +167,8 @@ public class DistributedFileSystem extends AbstractClient{
 	{
 		try {
 			DistributedFileSystem localClient = new DistributedFileSystem(InetAddress.getByName("localhost"), 9090);
-			//localClient.moveFile("/home/gisripa/dfs-testdata/music.mp3");
-			localClient.read("music.mp3");
+			//localClient.moveFile("/home/gisripa/dfs-testdata/movie.wmv");
+			localClient.read("movie.wmv");
 			
 			
 		} catch (UnknownHostException e) {

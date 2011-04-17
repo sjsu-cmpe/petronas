@@ -19,6 +19,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.log4j.Logger;
+
 import com.tdfs.fs.chunknode.element.Chunk;
 import com.tdfs.fs.metanode.element.FSMetadata;
 import com.tdfs.fs.metanode.element.File;
@@ -38,6 +40,8 @@ public class FileWriteHandler extends AbstractEventListener{
 	long fileSize = 0;
 	List<Chunk> chunksToTransfer = null;
 	FSMetadata metadata = null;
+	
+	private static Logger logger = Logger.getLogger(FileWriteHandler.class);
 	
 	public FileWriteHandler() {
 		
@@ -115,13 +119,13 @@ public class FileWriteHandler extends AbstractEventListener{
 	private void sendAcknowledgement(Socket socket)
 	{
 		sendResponse(socket, 
-				new DataPacket<String>(PacketType.ACKNOWLEDGEMENT, "Chunk Received", System.currentTimeMillis(), null));
+				new DataPacket<String>(PacketType.ACKNOWLEDGEMENT, "Chunk Received by MetaNode", System.currentTimeMillis(), null));
 	}
 
 	//TODO: Initiate send chunks to chunk nodes
 	public void sendChunks()
 	{
-		System.out.println("Sending chunks for persistence");
+		logger.debug("Chunks transferred for persistence");
 		AbstractClient client = null;
 		Iterator<Chunk> iterator = chunksToTransfer.iterator();
 		ExecutorService executorPool = Executors.newFixedThreadPool(6);
@@ -130,12 +134,11 @@ public class FileWriteHandler extends AbstractEventListener{
 		{
 			Chunk chunk = iterator.next();
 			try {
-				client = new MetaClient(InetAddress.getByName(metadata.getAvailableChunkNode().getHostName()),metadata.getAvailableChunkNode().getPort(),
+				client = new MetaClient(metadata.getAvailableChunkNode().getAddress(),metadata.getAvailableChunkNode().getPort(),
 						new DataPacket<Chunk>(PacketType.CHUNK_WRITE, chunk, System.currentTimeMillis(),null));
 				client.initiateConnection();
-			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (Exception e) {
+				logger.error("Weird Exception", e);
 			}
 			Future<DataPacket<?>> response = executorPool.submit(client);
 			responseSet.add(response);
@@ -147,7 +150,7 @@ public class FileWriteHandler extends AbstractEventListener{
 		{
 			try {
 				DataPacket<?> packet = response.get();
-				System.out.println("Response from chunknode"+packet.getData());
+				logger.info("Response from ChunkNode -->"+packet.getData());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

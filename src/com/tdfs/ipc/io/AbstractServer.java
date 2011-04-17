@@ -10,6 +10,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
+import com.tdfs.fs.chunknode.ChunkNode;
 import com.tdfs.interfaces.ipc.IPCServer;
 import com.tdfs.ipc.element.DataPacket;
 
@@ -19,7 +22,9 @@ public abstract class AbstractServer implements IPCServer {
 	protected ServerSocket providerSocket = null;
 	protected Socket connection = null;
 	private ObjectInputStream incomingData;	
-	protected ThreadPoolExecutor handlerExecutors;
+	
+	
+	private static Logger logger = Logger.getLogger(AbstractServer.class);
 	
 	@Override
 	public void startServer(InetAddress host, int port) {
@@ -28,10 +33,11 @@ public abstract class AbstractServer implements IPCServer {
 			providerSocket.bind(new InetSocketAddress(host, port));
 		} catch (IOException e) {
 			// TODO ERROR HANDLING AND LOGGING
-			e.printStackTrace();
+			//e.printStackTrace();
+			logger.error("Error occurred in binding the server socket", e);
+			
 		}
-		handlerExecutors = 
-			new ThreadPoolExecutor(5, 10, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(5, true));
+		
 				
 	}
 
@@ -44,7 +50,8 @@ public abstract class AbstractServer implements IPCServer {
 			providerSocket.close();
 		} catch (IOException e) {
 			// TODO ERROR HANDLING AND LOGGING
-			e.printStackTrace();
+			//e.printStackTrace();
+			logger.error("Error occurred while closing the Sockets and Streams ", e);
 		}
 		
 		
@@ -62,11 +69,15 @@ public abstract class AbstractServer implements IPCServer {
 			while(true)
 			{
 				
-				System.out.println("WAITING FOR INCOMING CONNECTIONS..."+providerSocket.getLocalPort());
+				//System.out.println("WAITING FOR INCOMING CONNECTIONS..."+providerSocket.getLocalPort());
+				logger.info("Waiting for Incoming Connections at "+providerSocket.getLocalSocketAddress());
+				
 				connection = providerSocket.accept();
-				// Delegate to Handler
-				System.out.println("REQUEST FROM --"+connection.getRemoteSocketAddress());
+				//System.out.println("REQUEST FROM --"+connection.getRemoteSocketAddress());
+				logger.info("Request from "+connection.getRemoteSocketAddress());
+				
 				incomingData = new ObjectInputStream(connection.getInputStream());
+				
 				DataPacket<?> dataPacket = (DataPacket<?>) incomingData.readObject();
 				
 				registerEvent(connection, dataPacket);
@@ -76,20 +87,18 @@ public abstract class AbstractServer implements IPCServer {
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
+			logger.error("Exception in Run method of AbstractServer", e);
 		}
 		finally{
 			
-			/*try {
-				if(incomingData.available() == 0)
-				{
+			try {
 					incomingData.close();
-				}
-				
+								
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}*/
+			}
 		}
 		
 	}
