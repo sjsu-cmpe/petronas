@@ -1,17 +1,14 @@
 package com.tdfs.fs.metanode;
 
 
-import java.net.InetAddress;
+
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -22,8 +19,9 @@ import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
 
 import com.tdfs.fs.chunknode.element.Chunk;
+import com.tdfs.fs.metanode.element.Dentry;
 import com.tdfs.fs.metanode.element.FSMetadata;
-import com.tdfs.fs.metanode.element.File;
+import com.tdfs.fs.metanode.element.INode;
 import com.tdfs.fs.util.IdGenerator;
 import com.tdfs.ipc.element.DataPacket;
 import com.tdfs.ipc.element.FileWriteDataPacket;
@@ -35,7 +33,7 @@ import com.tdfs.ipc.io.AbstractClient;
 
 public class FileWriteHandler extends AbstractEventListener{
 	FileWriteDataPacket fileDataPacket = null;
-	File file = null;
+	INode file = null;
 	List<String> chunkNames = null;
 	long fileSize = 0;
 	List<Chunk> chunksToTransfer = null;
@@ -60,7 +58,12 @@ public class FileWriteHandler extends AbstractEventListener{
 			if(((DataPacket<?>) arg1).getPacketType() == PacketType.FILE_WRITE)
 			{
 				this.fileDataPacket = (FileWriteDataPacket) arg1;
-				createFileObject();
+				createDirectoryStructure(this.fileDataPacket.getFileName(), this.fileDataPacket.isDirectory());
+				if(!this.fileDataPacket.isDirectory())
+				{
+					createFileObject();
+				}
+				
 				sendAcknowledgement(event.getEventSocket());
 			}
 			
@@ -77,15 +80,33 @@ public class FileWriteHandler extends AbstractEventListener{
 		 *  In addition, send the chunks to respective chunk nodes.
 		 */
 		byte[] chunk = fileDataPacket.getData();
+		String[] tokens = fileDataPacket.getFileName().split("/");
+		int length = tokens.length;
+		String fileName = tokens[length-1];
+		Dentry parentDentry = null;
+		
+		if(length >= 2)
+		{
+			
+			if(!tokens[length-2].equals(""))
+			{
+				parentDentry = metadata.getINode(tokens[length-2]).getDirectoryEntry();
+				logger.debug("File Directory added as -->"+parentDentry.getName());
+				
+			}
+		}
 		
 		if(file == null)
 		{
 			chunkNames = new LinkedList<String>();
 			
-			file = new File(fileDataPacket.getFileName());
+			
+			file = new INode(fileName);
 			file.setChecksum(fileDataPacket.getCheckSum());
 			file.setFileSize(chunk.length);
 			file.setVERSION(1);
+			file.setDirectory(false);
+			file.setDirectoryEntry(parentDentry);
 		
 		}
 		else
@@ -103,7 +124,7 @@ public class FileWriteHandler extends AbstractEventListener{
 		if(fileDataPacket.isLastPacket())
 		{
 			file.setBlockList(chunkNames);
-			metadata.updateFileMetadata(file.getFileName(), file);
+			metadata.updateINodeMap(file.getFileName(), file);
 			logger.info("File creation completed-->"+file.toString());
 			//TODO: Checksum check before sending else throw exception
 			sendChunks();
@@ -115,6 +136,53 @@ public class FileWriteHandler extends AbstractEventListener{
 		
 		
 	}
+	
+	private void createDirectoryStructure(String path,boolean isDirectory)
+	{
+		String[] tokens = path.split("/");
+		Dentry parentDirectory = null;
+		int endLimit = 0;
+		if(isDirectory)
+		{
+			endLimit = tokens.length;
+		}
+		else{
+			endLimit = tokens.length - 1;
+		}
+		for(int index=0;index<endLimit;index++)
+		{
+			if(index>=1)
+			{
+				if(!tokens[index-1].equals(""))
+				{
+					parentDirectory = metadata.getINode(tokens[index-1]).getDirectoryEntry();
+				}
+				logger.debug("Creating Directory --> "+tokens[index-1]+"/"+tokens[index]);
+				createDirectoryInodeEntry(tokens[index], parentDirectory);
+			}
+			else
+			{
+				if(!tokens[index].equals(""))
+				{
+					logger.debug("Creating Directory --> /Home/"+tokens[index]);
+					createDirectoryInodeEntry(tokens[index], metadata.getINode("Home").getDirectoryEntry());
+				}
+				
+			}
+			
+		}
+	}
+	
+	private void createDirectoryInodeEntry(String directoryName,Dentry parentDirectory)
+	{
+		INode iNode = new INode(directoryName);
+		Dentry dentry = new Dentry(directoryName,parentDirectory);
+		
+		iNode.setDirectory(true);
+		iNode.setDirectoryEntry(dentry);
+		metadata.updateINodeMap(directoryName, iNode);
+	}
+		
 	
 	private void sendAcknowledgement(Socket socket)
 	{

@@ -11,7 +11,7 @@ import java.util.Observable;
 import org.apache.log4j.Logger;
 
 import com.tdfs.fs.metanode.element.FSMetadata;
-import com.tdfs.fs.metanode.element.File;
+import com.tdfs.fs.metanode.element.INode;
 import com.tdfs.ipc.element.DataPacket;
 import com.tdfs.ipc.element.FileReadDataPacket;
 import com.tdfs.ipc.element.FileWriteDataPacket;
@@ -23,7 +23,7 @@ public class FileReadHandler extends AbstractEventListener {
 
 	private FSMetadata metadata = null;
 	private DataPacket<?> dataPacket = null;
-	private File file = null;
+	private INode file = null;
 	private Socket responseSocket = null;
 	private Map<String, InetSocketAddress> chunkMap = null;
 	String fileName;
@@ -55,9 +55,11 @@ public class FileReadHandler extends AbstractEventListener {
 
 	}
 	
+	
+	//TODO: Validate the file Path before reading the File
 	private void getAvailableChunksList(String fileName)
 	{
-		file = metadata.getFileMetadata(fileName);
+		file = metadata.getINode(fileName);
 		file.getBlockList();
 		List<String> chunkNames = file.getBlockList();
 		logger.debug("Chunk List Retrieved -->"+chunkNames.toString());
@@ -69,11 +71,12 @@ public class FileReadHandler extends AbstractEventListener {
 	
 	private void sendChunkMap()
 	{
+		
 		sendResponse(responseSocket, 
 				new FileReadDataPacket(PacketType.CHUNK_MAP, 
 						this.chunkMap, System.currentTimeMillis(), 
 						null, file.getFileName(), file.getChecksum(),
-						(LinkedList<String>) file.getBlockList()));
+						(LinkedList<String>) file.getBlockList(), false, file.getDirectoryEntry()));
 		
 	}
 

@@ -4,6 +4,8 @@ import java.net.InetSocketAddress;
 import java.util.LinkedList;
 import java.util.Map;
 
+import com.tdfs.fs.metanode.element.Dentry;
+
 //TODO: Change the class variables depending on the FILE metadata
 public class FileReadDataPacket extends DataPacket<Map<String,InetSocketAddress>> {
 
@@ -15,6 +17,8 @@ public class FileReadDataPacket extends DataPacket<Map<String,InetSocketAddress>
 	private String fileName;
 	private long checkSum;
 	private LinkedList<String> chunksListInOrder;
+	private boolean isDirectory;
+	private Dentry directoryEntry;
 	
 	public String getFileName()
 	{
@@ -31,16 +35,30 @@ public class FileReadDataPacket extends DataPacket<Map<String,InetSocketAddress>
 		return this.chunksListInOrder;
 	}
 	
+	public boolean isDirectory() {
+		return isDirectory;
+	}
+	
+	public Dentry getDirectoryEntry() {
+		return directoryEntry;
+	}
+	
 	public FileReadDataPacket(PacketType packetType,
 			Map<String, InetSocketAddress> data, long timeStamp,
 			InetSocketAddress inetSocketAddress,String fileName,
-			long checkSum,LinkedList<String> chunksListInOrder) 
+			long checkSum,LinkedList<String> chunksListInOrder,boolean isDirectory,Dentry directoryEntry) 
 	{
 		super(packetType, data, timeStamp, inetSocketAddress);
 		this.fileName = fileName;
 		this.checkSum = checkSum;
 		this.chunksListInOrder = chunksListInOrder;
+		this.isDirectory = isDirectory;
+		this.directoryEntry = directoryEntry;
 		
 	}
+
+	
+
+	
 
 }

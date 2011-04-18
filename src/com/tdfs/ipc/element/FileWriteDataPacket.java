@@ -13,6 +13,7 @@ public class FileWriteDataPacket extends DataPacket<byte[]> {
 	private long checkSum;
 	private int packetNumber;
 	private boolean isLastPacket;
+	private boolean isDirectory;
 	
 	
 	public String getFileName() {
@@ -32,13 +33,18 @@ public class FileWriteDataPacket extends DataPacket<byte[]> {
 		return isLastPacket;
 	}
 
+	public boolean isDirectory() {
+		return isDirectory;
+	}
+
 	public FileWriteDataPacket(PacketType packetType, byte[] data, long timeStamp,
-			InetSocketAddress packetOrigin,String fileName,long checkSum,int packetNumber,boolean isLastPacket) {
-		super(packetType, data, timeStamp, packetOrigin);
+			InetSocketAddress localChunkNodeInfo,String fileName,long checkSum,int packetNumber,boolean isLastPacket,boolean isDirectory) {
+		super(packetType, data, timeStamp, localChunkNodeInfo);
 		this.fileName = fileName;
 		this.checkSum = checkSum;
 		this.packetNumber = packetNumber;
 		this.isLastPacket = isLastPacket;
+		this.isDirectory = isDirectory;
 		
 	}
 	

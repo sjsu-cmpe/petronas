@@ -17,7 +17,7 @@ public class FSMetadata implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -5957663910403414461L;
-	private Map<String,File> fileMap;
+	private Map<String,INode> iNodeMap;
 	private Map<String,List<InetSocketAddress>> chunkReplicationMap;
 	private Map<String,InetSocketAddress> chunkLocationMap;
 	private List<InetSocketAddress> chunkNodeList;
@@ -48,16 +48,30 @@ public class FSMetadata implements Serializable{
 				//TODO: Remove this
 				System.out.println("Metadata not found - creating new metadata Instance");
 				metadata = new FSMetadata();
-				metadata.fileMap = new HashMap<String,File>();
+				metadata.iNodeMap = new HashMap<String,INode>();
 				metadata.chunkReplicationMap = new HashMap<String,List<InetSocketAddress>>();
 				metadata.chunkLocationMap = new HashMap<String, InetSocketAddress>();
 				metadata.chunkNodeList = new ArrayList<InetSocketAddress>();
+				
+				initHomeDirectory();
 					
 			}
 		}
 	
 		return metadata;
 	}
+	
+	private static void initHomeDirectory()
+	{
+		INode homeDirectory = new INode("Home");
+		homeDirectory.setDirectory(true);
+		Dentry dentry = new Dentry("Home", null);
+		homeDirectory.setDirectoryEntry(dentry);
+		
+		metadata.iNodeMap.put("Home", homeDirectory);
+		
+	}
+	
 	
 	/**
 	 * The metadata consists of File's name, checksum and the linked list of chunks to be joined to get the file. <br/>
@@ -66,20 +80,20 @@ public class FSMetadata implements Serializable{
 	 * @param fileName
 	 * @return File metadata
 	 */
-	public File getFileMetadata(String fileName)
+	public INode getINode(String fileName)
 	{
-		return fileMap.get(fileName);
+		return iNodeMap.get(fileName);
 	}
 	
-	public void updateFileMetadata(String fileName,File file)
+	public void updateINodeMap(String fileName,INode file)
 	{
-		if(!fileMap.containsKey(fileName))
+		if(!iNodeMap.containsKey(fileName))
 		{
-			fileMap.put(fileName, file);
+			iNodeMap.put(fileName, file);
 		}
 		else{
 			// TODO: Implement comparable and update only when changed
-			fileMap.put(fileName, file);
+			iNodeMap.put(fileName, file);
 		}
 	}
 	

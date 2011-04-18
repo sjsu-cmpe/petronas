@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 
 import com.tdfs.fs.io.DiskPersistence;
 import com.tdfs.fs.metanode.element.FSMetadata;
-import com.tdfs.fs.metanode.element.File;
+import com.tdfs.fs.metanode.element.INode;
 import com.tdfs.fs.scheduler.AbstractScheduler;
 import com.tdfs.fs.scheduler.MetadataSnapshot;
 import com.tdfs.ipc.element.DataPacket;
