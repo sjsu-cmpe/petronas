@@ -5,8 +5,13 @@ import java.net.InetAddress;
 import com.tdfs.ipc.element.DataPacket;
 import com.tdfs.ipc.io.AbstractClient;
 
+/**
+ * @author     gisripa
+ */
 public class ChunkClient extends AbstractClient {
 
+	/**
+	 */
 	private DataPacket<?> dataPacket = null;
 	
 	ChunkClient(InetAddress host, int port, DataPacket<?> dataPacket) {

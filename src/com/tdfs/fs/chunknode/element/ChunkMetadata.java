@@ -8,6 +8,9 @@ import java.util.Set;
 import com.tdfs.fs.io.DiskPersistence;
 import com.tdfs.fs.util.ResourceLoader;
 
+/**
+ * @author     gisripa
+ */
 public class ChunkMetadata implements Serializable{
 	
 	/**
@@ -15,7 +18,11 @@ public class ChunkMetadata implements Serializable{
 	 */
 	private static final long serialVersionUID = 4967762301835882441L;
 	
+	/**
+	 */
 	private static ChunkMetadata chunkMetadata = null;
+	/**
+	 */
 	private Set<String> chunkList = null;
 	
 	private ChunkMetadata()
@@ -46,6 +53,9 @@ public class ChunkMetadata implements Serializable{
 		this.chunkList.add(chunkName);
 	}
 	
+	/**
+	 * @return
+	 */
 	public Set<String> getChunkList()
 	{
 		return this.chunkList;

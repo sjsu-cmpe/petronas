@@ -4,10 +4,16 @@ import java.net.Socket;
 import java.util.Observable;
 
 import com.tdfs.ipc.element.DataPacket;
+import java.util.Observer;
 
+/**
+ * @author     gisripa
+ */
 public class DataEvent extends Observable{
 	
 	
+	/**
+	 */
 	private Socket eventSocket;
 	
 		
@@ -21,6 +27,9 @@ public class DataEvent extends Observable{
 	
 	
 	
+	/**
+	 * @return
+	 */
 	public Socket getEventSocket()
 	{
 		return eventSocket;

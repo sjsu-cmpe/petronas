@@ -3,23 +3,40 @@ package com.tdfs.ipc.element;
 import java.net.InetSocketAddress;
 
 
+/**
+ * @author     gisripa
+ */
 public class FileWriteDataPacket extends DataPacket<byte[]> {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -414293562856223720L;
+	/**
+	 */
 	private String fileName;
+	/**
+	 */
 	private long checkSum;
 	private int packetNumber;
+	/**
+	 */
 	private boolean isLastPacket;
+	/**
+	 */
 	private boolean isDirectory;
 	
 	
+	/**
+	 * @return
+	 */
 	public String getFileName() {
 		return fileName;
 	}
 
+	/**
+	 * @return
+	 */
 	public long getCheckSum() {
 		return checkSum;
 	}
@@ -29,10 +46,16 @@ public class FileWriteDataPacket extends DataPacket<byte[]> {
 		return this.packetNumber;
 	}
 	
+	/**
+	 * @return
+	 */
 	public boolean isLastPacket() {
 		return isLastPacket;
 	}
 
+	/**
+	 * @return
+	 */
 	public boolean isDirectory() {
 		return isDirectory;
 	}

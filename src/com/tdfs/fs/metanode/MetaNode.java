@@ -14,6 +14,9 @@ import org.apache.log4j.Logger;
 import com.tdfs.fs.io.DiskPersistence;
 import com.tdfs.fs.metanode.element.FSMetadata;
 import com.tdfs.fs.metanode.element.INode;
+import com.tdfs.fs.metanode.handler.FileReadHandler;
+import com.tdfs.fs.metanode.handler.FileWriteHandler;
+import com.tdfs.fs.metanode.handler.SocketEventHandler;
 import com.tdfs.fs.scheduler.AbstractScheduler;
 import com.tdfs.fs.scheduler.MetadataSnapshot;
 import com.tdfs.ipc.element.DataPacket;
@@ -22,13 +25,28 @@ import com.tdfs.ipc.event.DataEvent;
 import com.tdfs.ipc.io.AbstractServer;
 
 //TODO: Change the structure of the inheritance. Try Event-Driven design
+/**
+ * @author     gisripa
+ */
 public class MetaNode extends AbstractServer{
 	
+	/**
+	 */
 	public FSMetadata metadata;
+	/**
+	 */
 	private DataEvent dataEvent = null;
+	/**
+	 */
 	private SocketEventHandler socketEventHandler = null;
+	/**
+	 */
 	private FileWriteHandler fileWriteHandler = null;
+	/**
+	 */
 	private FileReadHandler fileReadHandler = null;
+	/**
+	 */
 	private AbstractScheduler scheduler = null;
 	
 	private static Logger logger = Logger.getLogger(MetaNode.class);

@@ -1,4 +1,4 @@
-package com.tdfs.fs.metanode;
+package com.tdfs.fs.metanode.handler;
 
 
 
@@ -19,6 +19,7 @@ import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
 
 import com.tdfs.fs.chunknode.element.Chunk;
+import com.tdfs.fs.metanode.MetaClient;
 import com.tdfs.fs.metanode.element.Dentry;
 import com.tdfs.fs.metanode.element.FSMetadata;
 import com.tdfs.fs.metanode.element.INode;
@@ -31,12 +32,21 @@ import com.tdfs.ipc.event.DataEvent;
 import com.tdfs.ipc.io.AbstractClient;
 
 
+/**
+ * @author     gisripa
+ */
 public class FileWriteHandler extends AbstractEventListener{
+	/**
+	 */
 	FileWriteDataPacket fileDataPacket = null;
+	/**
+	 */
 	INode file = null;
 	List<String> chunkNames = null;
 	long fileSize = 0;
 	List<Chunk> chunksToTransfer = null;
+	/**
+	 */
 	FSMetadata metadata = null;
 	
 	private static Logger logger = Logger.getLogger(FileWriteHandler.class);

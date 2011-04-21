@@ -18,6 +18,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.tdfs.fs.chunknode.element.ChunkMetadata;
+import com.tdfs.fs.chunknode.handler.ChunkReadHandler;
+import com.tdfs.fs.chunknode.handler.ChunkWriteHandler;
 import com.tdfs.fs.io.DiskPersistence;
 import com.tdfs.fs.scheduler.AbstractScheduler;
 import com.tdfs.fs.scheduler.ChunkdataSnapshot;
@@ -28,12 +30,25 @@ import com.tdfs.ipc.event.DataEvent;
 import com.tdfs.ipc.io.AbstractClient;
 import com.tdfs.ipc.io.AbstractServer;
 
+/**
+ * @author     gisripa
+ */
 public class ChunkNode extends AbstractServer{
 	
+	/**
+	 */
 	private DataEvent dataEvent = null;
+	/**
+	 */
 	private ChunkWriteHandler chunkWriteHandler = null;
+	/**
+	 */
 	private ChunkReadHandler chunkReadHandler = null;
+	/**
+	 */
 	private ChunkMetadata chunkInfo = null;
+	/**
+	 */
 	private AbstractScheduler scheduler = null;
 	
 	private static Logger logger = Logger.getLogger(ChunkNode.class);

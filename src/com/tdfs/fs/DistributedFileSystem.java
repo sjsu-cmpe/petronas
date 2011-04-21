@@ -25,6 +25,9 @@ import com.tdfs.ipc.element.FileWriteDataPacket;
 import com.tdfs.ipc.element.PacketType;
 import com.tdfs.ipc.io.AbstractClient;
 
+/**
+ * @author     gisripa
+ */
 public class DistributedFileSystem extends AbstractClient implements FileSystem{
 
 	DistributedFileSystem(InetAddress host, int port) {
@@ -35,8 +38,14 @@ public class DistributedFileSystem extends AbstractClient implements FileSystem{
 	File file = null;
 	private FileInputStream localInputStream = null;
 	private FileOutputStream localOutputStream = null;
+	/**
+	 */
 	private FileWriteDataPacket fileWriteDataPacket;
+	/**
+	 */
 	private FileReadDataPacket fileReadDataPacket;
+	/**
+	 */
 	private DataPacket<?> dataPacket;
 
 

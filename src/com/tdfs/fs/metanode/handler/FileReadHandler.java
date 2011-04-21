@@ -1,4 +1,4 @@
-package com.tdfs.fs.metanode;
+package com.tdfs.fs.metanode.handler;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -19,10 +19,19 @@ import com.tdfs.ipc.element.PacketType;
 import com.tdfs.ipc.event.AbstractEventListener;
 import com.tdfs.ipc.event.DataEvent;
 
+/**
+ * @author     gisripa
+ */
 public class FileReadHandler extends AbstractEventListener {
 
+	/**
+	 */
 	private FSMetadata metadata = null;
+	/**
+	 */
 	private DataPacket<?> dataPacket = null;
+	/**
+	 */
 	private INode file = null;
 	private Socket responseSocket = null;
 	private Map<String, InetSocketAddress> chunkMap = null;

@@ -1,4 +1,4 @@
-package com.tdfs.fs.chunknode;
+package com.tdfs.fs.chunknode.handler;
 
 import java.util.Observable;
 
@@ -11,9 +11,16 @@ import com.tdfs.ipc.element.PacketType;
 import com.tdfs.ipc.event.AbstractEventListener;
 import com.tdfs.ipc.event.DataEvent;
 
+/**
+ * @author     gisripa
+ */
 public class ChunkWriteHandler extends AbstractEventListener {
 
+	/**
+	 */
 	private Chunk chunk = null;
+	/**
+	 */
 	private ChunkMetadata chunkInfo = null;
 	
 	@Override

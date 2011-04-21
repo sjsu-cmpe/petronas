@@ -11,6 +11,9 @@ import com.tdfs.fs.io.DiskPersistence;
 import com.tdfs.fs.util.ResourceLoader;
 
 
+/**
+ * @author     gisripa
+ */
 public class FSMetadata implements Serializable{
 	
 	/**
@@ -22,6 +25,8 @@ public class FSMetadata implements Serializable{
 	private Map<String,InetSocketAddress> chunkLocationMap;
 	private List<InetSocketAddress> chunkNodeList;
 	
+	/**
+	 */
 	private static FSMetadata metadata = null;
 	
 	private FSMetadata()

@@ -6,11 +6,20 @@ import java.net.UnknownHostException;
 
 
 
+/**
+ * @author     gisripa
+ */
 public class ResourceLoader {
 	
+	/**
+	 */
 	ResourceLoader resourceLoader = new ResourceLoader();
+	/**
+	 */
 	private static final int BLOCK_SIZE = 4*1024*1024;
 	private static final String BLOCK_LOCATION = "/home/gisripa/Project/DFS/chunknode1/";
+	/**
+	 */
 	private static final String METADATA_LOCATION = "/home/gisripa/Project/DFS/metanode/metafile";
 	private static final String TEMP_LOCATION = "/home/gisripa/Project/DFS/client/";
 	
@@ -20,11 +29,17 @@ public class ResourceLoader {
 		
 	}
 	
+	/**
+	 * @return
+	 */
 	public static int getBlockSize()
 	{
 		return BLOCK_SIZE;
 	}
 	
+	/**
+	 * @return
+	 */
 	public static String getMetadataLocation()
 	{
 		return METADATA_LOCATION;
