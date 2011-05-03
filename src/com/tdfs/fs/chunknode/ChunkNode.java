@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import com.tdfs.fs.chunknode.element.ChunkMetadata;
 import com.tdfs.fs.chunknode.handler.ChunkReadHandler;
 import com.tdfs.fs.chunknode.handler.ChunkWriteHandler;
+import com.tdfs.fs.chunknode.handler.PingHandler;
 import com.tdfs.fs.io.DiskPersistence;
 import com.tdfs.fs.scheduler.AbstractScheduler;
 import com.tdfs.fs.scheduler.ChunkdataSnapshot;
@@ -31,7 +32,7 @@ import com.tdfs.ipc.io.AbstractClient;
 import com.tdfs.ipc.io.AbstractServer;
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class ChunkNode extends AbstractServer{
 	
@@ -44,6 +45,8 @@ public class ChunkNode extends AbstractServer{
 	/**
 	 */
 	private ChunkReadHandler chunkReadHandler = null;
+	
+	private PingHandler pingHandler = null;
 	/**
 	 */
 	private ChunkMetadata chunkInfo = null;
@@ -76,8 +79,10 @@ public class ChunkNode extends AbstractServer{
 		this.dataEvent = new DataEvent();
 		this.chunkWriteHandler = new ChunkWriteHandler();
 		this.chunkReadHandler = new ChunkReadHandler();
+		this.pingHandler = new PingHandler();
 		this.dataEvent.addObserver(this.chunkWriteHandler);
 		this.dataEvent.addObserver(chunkReadHandler);
+		this.dataEvent.addObserver(pingHandler);
 	}
 	
 		
@@ -129,7 +134,7 @@ public class ChunkNode extends AbstractServer{
 	{
 		try{
 			
-			ChunkNode server = new ChunkNode(InetAddress.getByName("localhost"), 9191);
+			ChunkNode server = new ChunkNode(ResourceLoader.getLocalChunkNodeAddress().getAddress(),ResourceLoader.getLocalChunkNodeAddress().getPort());
 			new Thread((AbstractServer)server).start();
 						
 		}

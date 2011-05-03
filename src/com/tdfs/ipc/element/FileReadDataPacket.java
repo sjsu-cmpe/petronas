@@ -8,7 +8,7 @@ import com.tdfs.fs.metanode.element.Dentry;
 
 //TODO: Change the class variables depending on the FILE metadata
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class FileReadDataPacket extends DataPacket<Map<String,InetSocketAddress>> {
 

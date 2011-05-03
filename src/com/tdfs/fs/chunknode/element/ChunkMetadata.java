@@ -9,7 +9,7 @@ import com.tdfs.fs.io.DiskPersistence;
 import com.tdfs.fs.util.ResourceLoader;
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class ChunkMetadata implements Serializable{
 	

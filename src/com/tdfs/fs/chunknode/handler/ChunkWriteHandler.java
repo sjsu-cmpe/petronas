@@ -12,7 +12,7 @@ import com.tdfs.ipc.event.AbstractEventListener;
 import com.tdfs.ipc.event.DataEvent;
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class ChunkWriteHandler extends AbstractEventListener {
 

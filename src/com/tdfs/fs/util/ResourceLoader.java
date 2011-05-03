@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
 
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class ResourceLoader {
 	
@@ -17,7 +17,7 @@ public class ResourceLoader {
 	/**
 	 */
 	private static final int BLOCK_SIZE = 4*1024*1024;
-	private static final String BLOCK_LOCATION = "/home/gisripa/Project/DFS/chunknode1/";
+	private static final String BLOCK_LOCATION = "/home/gisripa/Project/DFS/chunknode2/";
 	/**
 	 */
 	private static final String METADATA_LOCATION = "/home/gisripa/Project/DFS/metanode/metafile";
@@ -58,7 +58,7 @@ public class ResourceLoader {
 	public static InetSocketAddress getLocalChunkNodeAddress()
 	{
 		try {
-			return new InetSocketAddress(InetAddress.getByName("localhost"), 9191);
+			return new InetSocketAddress(InetAddress.getByName("localhost"), 9192);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

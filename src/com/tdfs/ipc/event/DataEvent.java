@@ -7,7 +7,7 @@ import com.tdfs.ipc.element.DataPacket;
 import java.util.Observer;
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class DataEvent extends Observable{
 	

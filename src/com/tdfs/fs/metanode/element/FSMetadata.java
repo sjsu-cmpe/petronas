@@ -3,16 +3,20 @@ package com.tdfs.fs.metanode.element;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.tdfs.fs.chunknode.ChunkNode;
 import com.tdfs.fs.io.DiskPersistence;
 import com.tdfs.fs.util.ResourceLoader;
 
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class FSMetadata implements Serializable{
 	
@@ -24,7 +28,9 @@ public class FSMetadata implements Serializable{
 	private Map<String,List<InetSocketAddress>> chunkReplicationMap;
 	private Map<String,InetSocketAddress> chunkLocationMap;
 	private List<InetSocketAddress> chunkNodeList;
+	private Map<String,List<InetSocketAddress>> fileAccessLog;
 	
+	private static int roundRobinIndex = 0;
 	/**
 	 */
 	private static FSMetadata metadata = null;
@@ -39,7 +45,13 @@ public class FSMetadata implements Serializable{
 		DiskPersistence<FSMetadata> diskPersistence = new DiskPersistence<FSMetadata>();
 		return diskPersistence.readObjectFromDisk(ResourceLoader.getMetadataLocation());
 	}
-	
+	/**
+	 * The metadata consists of File's name, checksum and the linked list of chunks to be joined to get the file. <br/>
+	 * This method is used to get the metadata for the existing file in the distributed file system.
+	 * 
+	 * @param fileName
+	 * @return File metadata
+	 */
 	/**
 	 * Singleton for Metadata of the file system.
 	 * @return
@@ -57,10 +69,12 @@ public class FSMetadata implements Serializable{
 				metadata.chunkReplicationMap = new HashMap<String,List<InetSocketAddress>>();
 				metadata.chunkLocationMap = new HashMap<String, InetSocketAddress>();
 				metadata.chunkNodeList = new ArrayList<InetSocketAddress>();
-				
+				metadata.fileAccessLog = new HashMap<String, List<InetSocketAddress>>();
 				initHomeDirectory();
 					
 			}
+			
+			
 		}
 	
 		return metadata;
@@ -78,13 +92,7 @@ public class FSMetadata implements Serializable{
 	}
 	
 	
-	/**
-	 * The metadata consists of File's name, checksum and the linked list of chunks to be joined to get the file. <br/>
-	 * This method is used to get the metadata for the existing file in the distributed file system.
-	 * 
-	 * @param fileName
-	 * @return File metadata
-	 */
+	
 	public INode getINode(String fileName)
 	{
 		return iNodeMap.get(fileName);
@@ -92,14 +100,17 @@ public class FSMetadata implements Serializable{
 	
 	public void updateINodeMap(String fileName,INode file)
 	{
-		if(!iNodeMap.containsKey(fileName))
-		{
-			iNodeMap.put(fileName, file);
+		synchronized (iNodeMap) {
+			if(!iNodeMap.containsKey(fileName))
+			{
+				iNodeMap.put(fileName, file);
+			}
+			else{
+				// TODO: Implement comparable and update only when changed
+				iNodeMap.put(fileName, file);
+			}
 		}
-		else{
-			// TODO: Implement comparable and update only when changed
-			iNodeMap.put(fileName, file);
-		}
+		
 	}
 	
 	public void updateChunkLocation(String blockName,List<InetSocketAddress> blockLocationList)
@@ -133,26 +144,62 @@ public class FSMetadata implements Serializable{
 	
 	public void updateChunkNodeList(InetSocketAddress hostAddress,boolean isAlive)
 	{
-		if(isAlive)
+		synchronized(chunkNodeList)
 		{
-			if(!chunkNodeList.contains(hostAddress))
+			if(isAlive)
 			{
-				chunkNodeList.add(hostAddress);
+				if(!chunkNodeList.contains(hostAddress))
+				{
+					chunkNodeList.add(hostAddress);
+				}
+			}
+			else{
+				chunkNodeList.remove(chunkNodeList);
 			}
 		}
-		else{
-			chunkNodeList.remove(chunkNodeList);
+		
+		
+	}
+	
+	/**
+	 * Round robin way of accessing available chunk Nodes
+	 * @return
+	 */
+	public InetSocketAddress getAvailableChunkNode()
+	{
+		if(roundRobinIndex < this.chunkNodeList.size())
+		{
+			
+			return this.chunkNodeList.get(roundRobinIndex++);
+			
+		}
+		else
+		{
+			roundRobinIndex = 0;
+			if(roundRobinIndex < this.chunkNodeList.size())
+			{
+				return this.chunkNodeList.get(roundRobinIndex++);
+				
+			}
+			else{
+				return null;
+			}
 		}
 		
 	}
 	
-	public InetSocketAddress getAvailableChunkNode()
+	public Iterator<InetSocketAddress> getChunkNodeListIterator()
 	{
-		return chunkNodeList.get(0);
+		return this.chunkNodeList.iterator();
 	}
 	
+	public List<InetSocketAddress> getChunkNodeList()
+	{
+		return this.chunkNodeList;
+	}
 	
 	// TODO: Heuristics to decide the nearest available chunk node.
+	@Deprecated
 	public InetSocketAddress getChunkNode(InetSocketAddress sourceNode)
 	{
 		return chunkNodeList.get(0);
@@ -193,6 +240,42 @@ public class FSMetadata implements Serializable{
 		}
 	}
 	
+		
+	public Set<String> getFilesAccessed()
+	{
+		return this.fileAccessLog.keySet();
+	}
+	
+	public List<InetSocketAddress> getNodesAccessingFile(String fileName)
+	{
+		return  this.fileAccessLog.get(fileName);
+	}
+	
+	public void updateAccessLog(String fileName,InetSocketAddress chunkNodeAddress)
+	{
+		List<InetSocketAddress> chunkNodeAddressList = null;
+		synchronized (this.fileAccessLog) {
+			if(this.fileAccessLog.containsKey(fileName))
+			{
+				chunkNodeAddressList = this.fileAccessLog.get(fileName);
+				chunkNodeAddressList.add(chunkNodeAddress);
+			}
+			else{
+				chunkNodeAddressList = new ArrayList<InetSocketAddress>();
+				chunkNodeAddressList.add(chunkNodeAddress);
+			}
+			this.fileAccessLog.put(fileName, chunkNodeAddressList);
+		}
+		
+	}
+	
+	public void clearAccessLog()
+	{
+		synchronized (this.fileAccessLog) {
+			this.fileAccessLog.clear();
+		}
+		
+	}
 
 	
 }

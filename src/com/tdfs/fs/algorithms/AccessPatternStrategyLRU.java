@@ -4,7 +4,7 @@ import java.net.InetSocketAddress;
 
 import com.tdfs.interfaces.common.AccessPatternStrategy;
 
-public class AccessPatternStrategyImpl implements AccessPatternStrategy {
+public class AccessPatternStrategyLRU implements AccessPatternStrategy {
 
 	@Override
 	public InetSocketAddress getChunkNode(String fileName) {

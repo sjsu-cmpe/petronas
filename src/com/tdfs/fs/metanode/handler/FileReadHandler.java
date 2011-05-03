@@ -20,7 +20,7 @@ import com.tdfs.ipc.event.AbstractEventListener;
 import com.tdfs.ipc.event.DataEvent;
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class FileReadHandler extends AbstractEventListener {
 
@@ -55,9 +55,10 @@ public class FileReadHandler extends AbstractEventListener {
 			{
 				dataPacket = (DataPacket<?>) arg1;
 				fileName = (String) dataPacket.getData();
-				getAvailableChunksList(fileName);
 				responseSocket = event.getEventSocket();
-				sendChunkMap();
+				getAvailableChunksList(fileName);
+				
+				
 			}
 						
 		}
@@ -69,13 +70,22 @@ public class FileReadHandler extends AbstractEventListener {
 	private void getAvailableChunksList(String fileName)
 	{
 		file = metadata.getINode(fileName);
-		file.getBlockList();
-		List<String> chunkNames = file.getBlockList();
-		logger.debug("Chunk List Retrieved -->"+chunkNames.toString());
-		for(String chunkName : chunkNames)
+		if(file != null)
 		{
-			chunkMap.put(chunkName, metadata.getChunkNode(chunkName));
+			file.getChunkList();
+			List<String> chunkNames = file.getChunkList();
+			logger.debug("Chunk List Retrieved -->"+chunkNames.toString());
+			for(String chunkName : chunkNames)
+			{
+				chunkMap.put(chunkName, metadata.getChunkNode(chunkName));
+			}
+			sendChunkMap();
+			metadata.updateAccessLog(fileName, dataPacket.getChunkNodeInfo());
 		}
+		else{
+			sendErrorNotification();
+		}
+		
 	}
 	
 	private void sendChunkMap()
@@ -85,8 +95,14 @@ public class FileReadHandler extends AbstractEventListener {
 				new FileReadDataPacket(PacketType.CHUNK_MAP, 
 						this.chunkMap, System.currentTimeMillis(), 
 						null, file.getFileName(), file.getChecksum(),
-						(LinkedList<String>) file.getBlockList(), false, file.getDirectoryEntry()));
+						(LinkedList<String>) file.getChunkList(), false, file.getDirectoryEntry()));
 		
+	}
+	
+	private void sendErrorNotification()
+	{
+		sendResponse(responseSocket, 
+				new DataPacket<String>(PacketType.ERROR, "File does not exist in the DFS!!", System.currentTimeMillis(), null));
 	}
 
 }

@@ -7,7 +7,7 @@ import com.tdfs.ipc.element.DataPacket;
 
 public interface IPCClient extends Callable<DataPacket<?>> {
 	
-	public void initiateConnection();
+	public boolean initiateConnection();
 	
 	public void finishConnection();
 

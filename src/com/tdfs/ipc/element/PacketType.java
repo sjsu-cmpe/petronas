@@ -1,7 +1,7 @@
 package com.tdfs.ipc.element;
 
 /**
- * @author       gisripa
+ * @author          gisripa
  */
 public enum PacketType {
 	/**

@@ -26,7 +26,7 @@ import com.tdfs.ipc.element.PacketType;
 import com.tdfs.ipc.io.AbstractClient;
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class DistributedFileSystem extends AbstractClient implements FileSystem{
 
@@ -127,24 +127,32 @@ public class DistributedFileSystem extends AbstractClient implements FileSystem{
 
 			dataPacket = new DataPacket<String>(PacketType.FILE_READ, 
 					fileName, System.currentTimeMillis(), 
-					new InetSocketAddress(InetAddress.getByName("localhost"), 9191));
+					ResourceLoader.getLocalChunkNodeAddress());
 			initiateConnection();
 			sendMessage(dataPacket);
 
-			fileReadDataPacket =  (FileReadDataPacket) responseHandler();
-			chunkMap = fileReadDataPacket.getData();
-			System.out.println(getDirStructure(fileReadDataPacket.getDirectoryEntry()));
+			dataPacket =  (DataPacket<?>) responseHandler();
+			if(dataPacket.getPacketType() == PacketType.ERROR)
+			{
+				System.out.println(dataPacket.getData());
+			}
+			else{
+				fileReadDataPacket = (FileReadDataPacket) dataPacket;
+			}
+			
 			
 			if(fileReadDataPacket != null)
 			{
 				//TODO: Check the checkSum before writing
+				chunkMap = fileReadDataPacket.getData();
+				System.out.println(getDirStructure(fileReadDataPacket.getDirectoryEntry()));
 				chunkList = fileReadDataPacket.getChunksList();
 				for(String chunkName : chunkList)
 				{
 					InetSocketAddress chunkNodeAddress = chunkMap.get(chunkName);
 					tempClient = new DistributedFileSystem(chunkNodeAddress.getAddress(), chunkNodeAddress.getPort());
 					tempClient.initiateConnection();
-					tempClient.sendMessage(new DataPacket<String>(PacketType.CHUNK_READ, chunkName, System.currentTimeMillis(), null));
+					tempClient.sendMessage(new DataPacket<String>(PacketType.CHUNK_READ, chunkName, System.currentTimeMillis(), ResourceLoader.getLocalChunkNodeAddress()));
 					DataPacket<Chunk> chunkData = (DataPacket<Chunk>) tempClient.responseHandler();
 					//TODO: Move the exception handling
 					try {
@@ -154,6 +162,8 @@ public class DistributedFileSystem extends AbstractClient implements FileSystem{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					
+					Thread.sleep(5000);
 
 				}
 
@@ -228,9 +238,19 @@ public class DistributedFileSystem extends AbstractClient implements FileSystem{
 	public static void main(String... args)
 	{
 		try {
-			DistributedFileSystem localClient = new DistributedFileSystem(InetAddress.getByName("localhost"), 9090);
-			//localClient.move("/home/gisripa/dfs-testdata/movie.wmv","gisripa/movies/movie.wmv");
-			localClient.read("movie.wmv");
+			final DistributedFileSystem localClient = new DistributedFileSystem(InetAddress.getByName("localhost"), 9090);
+			//localClient.move("/home/gisripa/dfs-testdata/music2.mp3","gisripa/music/music2.mp3");
+			/*new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					localClient.move("/home/gisripa/dfs-testdata/music1.mp3","gisripa/music/music1.mp3");
+					
+				}
+			}
+					).start();*/
+			localClient.read("music2.mp3");
+			//localClient.read("movie.wmv");
 			//localClient.mkdir("/songs/ladygaga/2001");
 
 		} catch (UnknownHostException e) {

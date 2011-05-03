@@ -3,7 +3,7 @@ package com.tdfs.fs.metanode.element;
 import java.io.Serializable;
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class Dentry implements Serializable{
 	

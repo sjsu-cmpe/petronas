@@ -4,7 +4,7 @@ import java.net.InetSocketAddress;
 
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class FileWriteDataPacket extends DataPacket<byte[]> {
 

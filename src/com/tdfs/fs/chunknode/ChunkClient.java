@@ -6,7 +6,7 @@ import com.tdfs.ipc.element.DataPacket;
 import com.tdfs.ipc.io.AbstractClient;
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class ChunkClient extends AbstractClient {
 

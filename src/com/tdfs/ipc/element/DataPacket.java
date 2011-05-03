@@ -6,7 +6,7 @@ import java.net.InetSocketAddress;
 
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class DataPacket<T> implements Serializable{
 	

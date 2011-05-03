@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.zip.CRC32;
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class INode implements Serializable{
 	
@@ -62,14 +62,14 @@ public class INode implements Serializable{
 	/**
 	 * @return
 	 */
-	public List<String> getBlockList() {
+	public List<String> getChunkList() {
 		return blockList;
 	}
 	/**
-	 * @param  blockNamesList
+	 * @param  chunkNamesList
 	 */
-	public void setBlockList(List<String> blockNamesList) {
-		this.blockList = blockNamesList;
+	public void setChunkList(List<String> chunkNamesList) {
+		this.blockList = chunkNamesList;
 	}
 	/**
 	 * @param  checksum

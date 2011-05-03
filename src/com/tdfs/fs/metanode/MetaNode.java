@@ -18,7 +18,9 @@ import com.tdfs.fs.metanode.handler.FileReadHandler;
 import com.tdfs.fs.metanode.handler.FileWriteHandler;
 import com.tdfs.fs.metanode.handler.SocketEventHandler;
 import com.tdfs.fs.scheduler.AbstractScheduler;
+import com.tdfs.fs.scheduler.ChunkRelocator;
 import com.tdfs.fs.scheduler.MetadataSnapshot;
+import com.tdfs.fs.scheduler.PingScheduler;
 import com.tdfs.ipc.element.DataPacket;
 import com.tdfs.ipc.element.PacketType;
 import com.tdfs.ipc.event.DataEvent;
@@ -26,7 +28,7 @@ import com.tdfs.ipc.io.AbstractServer;
 
 //TODO: Change the structure of the inheritance. Try Event-Driven design
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class MetaNode extends AbstractServer{
 	
@@ -47,7 +49,11 @@ public class MetaNode extends AbstractServer{
 	private FileReadHandler fileReadHandler = null;
 	/**
 	 */
-	private AbstractScheduler scheduler = null;
+	private AbstractScheduler scheduler1 = null;
+	private AbstractScheduler scheduler2 = null;
+	private AbstractScheduler scheduler3 = null;
+	
+	private boolean isStandByMode = false;
 	
 	private static Logger logger = Logger.getLogger(MetaNode.class);
 	
@@ -55,17 +61,33 @@ public class MetaNode extends AbstractServer{
 	{
 		super.startServer(host, port);
 		this.initMetaNode();
+		this.initSchedulers();
 		
 				
 	}
 	
+	public void setStandByMode(boolean isStandByMode) {
+		this.isStandByMode = isStandByMode;
+	}
+
+	public boolean isStandByMode() {
+		return isStandByMode;
+	}
+
 	private void initMetaNode()
 	{
 		logger.info("Entering Initialization Mode...");
 		metadata = FSMetadata.getInstance();
 		registerEventHandlers();
-		scheduler = new MetadataSnapshot(3000, 3000);
+		
 				
+	}
+	
+	private void initSchedulers()
+	{
+		scheduler1 = new MetadataSnapshot(3000, 3000);
+		//scheduler2 = new PingScheduler(3000, 25000);
+		scheduler3 = new ChunkRelocator(12000, 60000);
 	}
 	
 	private void registerEventHandlers()

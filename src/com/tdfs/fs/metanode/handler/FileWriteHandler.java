@@ -2,6 +2,7 @@ package com.tdfs.fs.metanode.handler;
 
 
 
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +34,7 @@ import com.tdfs.ipc.io.AbstractClient;
 
 
 /**
- * @author     gisripa
+ * @author       gisripa
  */
 public class FileWriteHandler extends AbstractEventListener{
 	/**
@@ -67,14 +68,21 @@ public class FileWriteHandler extends AbstractEventListener{
 		{
 			if(((DataPacket<?>) arg1).getPacketType() == PacketType.FILE_WRITE)
 			{
-				this.fileDataPacket = (FileWriteDataPacket) arg1;
-				createDirectoryStructure(this.fileDataPacket.getFileName(), this.fileDataPacket.isDirectory());
-				if(!this.fileDataPacket.isDirectory())
+				if(metadata.getAvailableChunkNode() != null)
 				{
-					createFileObject();
+					this.fileDataPacket = (FileWriteDataPacket) arg1;
+					createDirectoryStructure(this.fileDataPacket.getFileName(), this.fileDataPacket.isDirectory());
+					if(!this.fileDataPacket.isDirectory())
+					{
+						createFileObject();
+					}
+					
+					sendAcknowledgement(event.getEventSocket());
+				}
+				else{
+					sendErrorNotification(event.getEventSocket());
 				}
 				
-				sendAcknowledgement(event.getEventSocket());
 			}
 			
 			
@@ -133,7 +141,7 @@ public class FileWriteHandler extends AbstractEventListener{
 		
 		if(fileDataPacket.isLastPacket())
 		{
-			file.setBlockList(chunkNames);
+			file.setChunkList(chunkNames);
 			metadata.updateINodeMap(file.getFileName(), file);
 			logger.info("File creation completed-->"+file.toString());
 			//TODO: Checksum check before sending else throw exception
@@ -199,6 +207,12 @@ public class FileWriteHandler extends AbstractEventListener{
 		sendResponse(socket, 
 				new DataPacket<String>(PacketType.ACKNOWLEDGEMENT, "Chunk Received by MetaNode", System.currentTimeMillis(), null));
 	}
+	
+	private void sendErrorNotification(Socket socket)
+	{
+		sendResponse(socket, 
+				new DataPacket<String>(PacketType.ERROR, "No Chunk Node active, please contact sysadmin", System.currentTimeMillis(), null));
+	}
 
 	//TODO: Initiate send chunks to chunk nodes
 	public void sendChunks()
@@ -208,11 +222,12 @@ public class FileWriteHandler extends AbstractEventListener{
 		Iterator<Chunk> iterator = chunksToTransfer.iterator();
 		ExecutorService executorPool = Executors.newFixedThreadPool(6);
 		Set<Future<DataPacket<?>>> responseSet = new HashSet<Future<DataPacket<?>>>();
+		InetSocketAddress chunkNodeAddress = metadata.getAvailableChunkNode();
 		while(iterator.hasNext())
 		{
 			Chunk chunk = iterator.next();
 			try {
-				client = new MetaClient(metadata.getAvailableChunkNode().getAddress(),metadata.getAvailableChunkNode().getPort(),
+				client = new MetaClient(chunkNodeAddress.getAddress(),chunkNodeAddress.getPort(),
 						new DataPacket<Chunk>(PacketType.CHUNK_WRITE, chunk, System.currentTimeMillis(),null));
 				client.initiateConnection();
 			} catch (Exception e) {
@@ -221,7 +236,7 @@ public class FileWriteHandler extends AbstractEventListener{
 			Future<DataPacket<?>> response = executorPool.submit(client);
 			responseSet.add(response);
 			
-			metadata.updateChunkLocationMap(chunk.getChunkFileName(), metadata.getAvailableChunkNode());
+			metadata.updateChunkLocationMap(chunk.getChunkFileName(), chunkNodeAddress);
 		}
 		
 		for(Future<DataPacket<?>> response: responseSet)

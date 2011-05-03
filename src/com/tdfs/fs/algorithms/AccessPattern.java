@@ -4,8 +4,13 @@ import java.net.InetSocketAddress;
 
 import com.tdfs.interfaces.common.AccessPatternStrategy;
 
+/**
+ * @author  gisripa
+ */
 public class AccessPattern {
 	
+	/**
+	 */
 	private AccessPatternStrategy accessPatternStrategy = null;
 	
 	public InetSocketAddress getChunkNode(String fileName)
@@ -13,14 +18,20 @@ public class AccessPattern {
 		return accessPatternStrategy.getChunkNode(fileName);
 	}
 	
+	/** 
+	 * @param accessPatternStrategy
+	 */
 	public void setAccessPatternStrategy(AccessPatternStrategy accessPatternStrategy)
 	{
 		this.accessPatternStrategy = accessPatternStrategy;
 	}
 	
+	/** 
+	 * @return
+	 */
 	public AccessPatternStrategy getAccessPatternStrategy()
 	{
-		return this.accessPatternStrategy;
+		return accessPatternStrategy;
 	}
 
 }

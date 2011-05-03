@@ -1,5 +1,5 @@
 package com.tdfs.interfaces.common;
 
-public interface ChunkNodeDiscovery {
+public interface NodeDiscoveryStrategy {
 
 }

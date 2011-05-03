@@ -35,16 +35,20 @@ public abstract class AbstractClient implements IPCClient{
 	}
 	
 	@Override
-	public void initiateConnection() {
-		
+	public boolean initiateConnection() {
+		boolean connectionSuccessful = false;
 		try{
 			requestSocket = new Socket(this.host,this.port);
 			logger.info(new StringBuilder("Connected to -->").append(host).append(",").append(port));
+			connectionSuccessful = true;
 		}
 		catch(IOException ioe)
 		{
 			logger.error("Exception occurred in initiating Client Connection", ioe);
+			connectionSuccessful = false;
 		}
+		
+		return connectionSuccessful;
 		
 		
 	}
