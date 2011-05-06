@@ -113,11 +113,7 @@ public class FSMetadata implements Serializable{
 		
 	}
 	
-	public void updateChunkLocation(String blockName,List<InetSocketAddress> blockLocationList)
-	{
-		//TODO: Implement block location update strategy
-		chunkReplicationMap.put(blockName, blockLocationList);
-	}
+	
 	
 	public void updateChunkReplicationMap(String chunkName,InetSocketAddress chunkNodeAddress)
 	{
@@ -224,10 +220,17 @@ public class FSMetadata implements Serializable{
 	
 	public void updateChunkLocationMap(String chunkName,InetSocketAddress chunkAddress)
 	{
-		if(this.chunkLocationMap != null)
-		{
-			this.chunkLocationMap.put(chunkName, chunkAddress);
+		synchronized (chunkLocationMap) {
+			if(this.chunkLocationMap != null)
+			{
+				this.chunkLocationMap.put(chunkName, chunkAddress);
+			}
+			else{
+				//TODO: Only put the changed value.
+				this.chunkLocationMap.put(chunkName, chunkAddress);
+			}
 		}
+		
 	}
 	
 	

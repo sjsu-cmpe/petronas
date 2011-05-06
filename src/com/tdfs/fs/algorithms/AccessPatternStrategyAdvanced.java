@@ -24,7 +24,7 @@ public class AccessPatternStrategyAdvanced implements AccessPatternStrategy {
 		Map<InetSocketAddress,Integer> accessCountPerChunkNode = new HashMap<InetSocketAddress, Integer>();
 		Entry<InetSocketAddress,Integer> maxCountEntry = null;
 		metadata = FSMetadata.getInstance();
-		
+		long startTime = System.currentTimeMillis();
 		List<InetSocketAddress> chunkNodeAddresses = metadata.getNodesAccessingFile(fileName);
 		
 		int totalTimesAccessed = chunkNodeAddresses.size();
@@ -61,6 +61,8 @@ public class AccessPatternStrategyAdvanced implements AccessPatternStrategy {
 		logger.debug(maxCountEntry.getKey()+" Accessed -->"+maxCountEntry.getValue()+" times");
 		float probabilityOfAccess = (float) maxCountEntry.getValue()/totalTimesAccessed;
 		logger.debug(probabilityOfAccess+" is the probability");
+		long endTime = System.currentTimeMillis();
+		logger.debug((endTime-startTime)/1000+" seconds");
 		if(probabilityOfAccess > 0.8)
 		{
 			return maxCountEntry.getKey();

@@ -25,14 +25,18 @@ public class ChunkReadHandler extends AbstractEventListener {
 		if(arg1 instanceof DataPacket<?>)
 		{
 			DataPacket<?> packet = (DataPacket<?>) arg1;
-			if(packet.getData() instanceof String)
+			if(packet.getPacketType() == PacketType.CHUNK_READ)
 			{
-				String chunkName = (String) packet.getData();
-				readChunk(chunkName);
-				
-				sendResponse(event.getEventSocket(),
-						new DataPacket<Chunk>(PacketType.CHUNK_DATA, chunk, System.currentTimeMillis(), null));
+				if(packet.getData() instanceof String)
+				{
+					String chunkName = (String) packet.getData();
+					readChunk(chunkName);
+					
+					sendResponse(event.getEventSocket(),
+							new DataPacket<Chunk>(PacketType.CHUNK_DATA, chunk, System.currentTimeMillis(), null));
+				}
 			}
+			
 			
 		}
 

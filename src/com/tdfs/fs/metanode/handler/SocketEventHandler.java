@@ -4,6 +4,8 @@ import java.net.Socket;
 import java.util.Observable;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.tdfs.fs.metanode.element.FSMetadata;
 import com.tdfs.ipc.element.DataPacket;
 import com.tdfs.ipc.element.PacketType;
@@ -22,6 +24,9 @@ public class SocketEventHandler extends AbstractEventListener {
 	/**
 	 */
 	private DataPacket<?> dataPacket = null;
+	
+	private static Logger logger = Logger.getLogger(SocketEventHandler.class);
+	
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		DataEvent event = (DataEvent) arg0;
@@ -47,6 +52,7 @@ public class SocketEventHandler extends AbstractEventListener {
 	{
 		metadata = FSMetadata.getInstance();
 		metadata.updateChunkNodeList(this.dataPacket.getChunkNodeInfo(), true);
+		logger.info("Registering Chunk Node -->"+this.dataPacket.getChunkNodeInfo());
 		
 	}
 	

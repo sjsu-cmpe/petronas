@@ -21,6 +21,7 @@ import com.tdfs.fs.scheduler.AbstractScheduler;
 import com.tdfs.fs.scheduler.ChunkRelocator;
 import com.tdfs.fs.scheduler.MetadataSnapshot;
 import com.tdfs.fs.scheduler.PingScheduler;
+import com.tdfs.fs.util.ResourceLoader;
 import com.tdfs.ipc.element.DataPacket;
 import com.tdfs.ipc.element.PacketType;
 import com.tdfs.ipc.event.DataEvent;
@@ -85,9 +86,9 @@ public class MetaNode extends AbstractServer{
 	
 	private void initSchedulers()
 	{
-		scheduler1 = new MetadataSnapshot(3000, 3000);
-		//scheduler2 = new PingScheduler(3000, 25000);
-		scheduler3 = new ChunkRelocator(12000, 60000);
+		scheduler1 = new MetadataSnapshot(5000, 10000);
+		scheduler2 = new PingScheduler(3000, 25000);
+		scheduler3 = new ChunkRelocator(60000, 60000);
 	}
 	
 	private void registerEventHandlers()
@@ -120,11 +121,12 @@ public class MetaNode extends AbstractServer{
 	public static void main(String[] args)
 	{
 		try {
-			AbstractServer server = new MetaNode(InetAddress.getByName("localhost"), 9090);
+			ResourceLoader.loadConfigurations();
+			AbstractServer server = new MetaNode(ResourceLoader.getMetaNodeAddress().getAddress(), ResourceLoader.getMetaNodeAddress().getPort());
 			new Thread(server).start();
 			
 			
-		} catch (UnknownHostException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

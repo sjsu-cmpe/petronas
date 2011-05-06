@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<ChunkSize>67108864</ChunkSize>
+	<Master>
+		<HostIP>192.168.1.54</HostIP>
+		<Port>9090</Port>
+		<StorageLocation>/home/gisripa/Project/DFS/metanode/metafile</StorageLocation>
+	</Master>
+	<Slave>
+		<HostIP>192.168.1.54</HostIP>
+		<Port>9191</Port>
+		<StorageLocation>/home/gisripa/Project/DFS/chunknode2/</StorageLocation>
+	</Slave>
+	<Schedulers>
+		<Scheduler>
+			<Name>MetadataSnapshot</Name>
+			<InitialDelay>1000</InitialDelay>
+			<RepeatDelay>1000</RepeatDelay>
+		</Scheduler>
+		<Scheduler>
+			<Name>ChunkdataSnapshot</Name>
+			<InitialDelay>1000</InitialDelay>
+			<RepeatDelay>1000</RepeatDelay>
+		</Scheduler>
+		<Scheduler>
+			<Name>ChunkRelocator</Name>
+			<InitialDelay>1000</InitialDelay>
+			<RepeatDelay>1000</RepeatDelay>
+		</Scheduler>
+		<Scheduler>
+			<Name>PingScheduler</Name>
+			<InitialDelay>1000</InitialDelay>
+			<RepeatDelay>1000</RepeatDelay>
+		</Scheduler>
+	</Schedulers>
+</Configuration>

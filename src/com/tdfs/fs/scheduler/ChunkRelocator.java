@@ -76,6 +76,17 @@ public class ChunkRelocator extends AbstractScheduler {
 						{
 							responseSet.add(executorService.submit(relocationClient));
 						}
+						//relocationClient.finishConnection();
+						relocationClient = new MetaClient(srcChunkNodeAddress.getAddress(),
+								srcChunkNodeAddress.getPort(), 
+								new DataPacket<String>(PacketType.CHUNK_REMOVE, chunkName, System.currentTimeMillis(), null)); 
+						
+						if(relocationClient.initiateConnection())
+						{
+							Future<DataPacket<?>> acknowledgement = executorService.submit(relocationClient);
+							logger.info(acknowledgement.get().getData());
+						}
+						//relocationClient.finishConnection();
 					}
 				}
 				for(Future<DataPacket<?>> response:responseSet)
@@ -89,8 +100,13 @@ public class ChunkRelocator extends AbstractScheduler {
 						Future<DataPacket<?>> acknowledgement = executorService.submit(relocationClient);
 						logger.debug(acknowledgement.get().getData());
 						logger.info(chunk.getChunkFileName()+" Relocated");
+						metadata.updateChunkLocationMap(chunk.getChunkFileName(), chunkNodeAddress);
 						isRelocated = true;
+						
+						
 					}
+					//relocationClient.finishConnection();
+					
 				}
 				
 				

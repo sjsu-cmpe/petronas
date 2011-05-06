@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ThinDFS" default="help" basedir=".">
+	
+	<!-- ========================================= -->
+
+	<target name='help'>
+		<echo>
+			Thin DFS - Prototype implementation 
+			
+			Requires:
+				1. Java JRE 1.6.x 
+				2. Junit JAR classpath should be updated in the ANT
+			
+			
+			Build Notes:
+				1. Build the jar from source files
+			
+			Primary Targets:
+				
+		</echo>
+	</target>
+
+	<!-- ========================================= -->
+
+
+
+	<target name="init">
+		<property name="src.dir" value="${basedir}/src"/>
+		<property name="bin.dir" value="${basedir}/bin" />
+		<property name="build.dir" value="${basedir}/build" />
+		<property name="jar.name" value="TDFS-1.0-beta" />
+		
+		<path id="build.classpath">
+			<pathelement location='${basedir}/bin' />
+			<pathelement location='${basedir}/log4j-1.2.16.jar' />
+		</path>
+		
+	</target>
+	
+	<target name="clean" depends="init">
+		<delete dir="${bin.dir}" quiet="true" />
+		<delete dir="${build.dir}" quiet="true" />
+	</target>
+	
+	<target name="build" depends="init">
+		<mkdir dir="${bin.dir}"/>
+		<mkdir dir="${build.dir}"/>
+		<javac srcdir="${src.dir}" destdir="${bin.dir}"  classpathref='build.classpath'>
+		</javac>
+		<!-- Copy Non Java files to the bin folder -->
+		<copy todir="${bin.dir}" includeemptydirs="false">
+			<fileset dir="src" excludes="**/*.java" />
+		</copy>
+	</target>
+		
+	
+	<target name="jar" depends="build">
+		<jar compress='false' destfile="${build.dir}/${jar.name}.jar">
+			<fileset dir="${bin.dir}">
+				<include name="**/*" />
+			</fileset>
+			
+		</jar>
+	</target>
+	
+</project>

@@ -38,7 +38,8 @@ public abstract class AbstractClient implements IPCClient{
 	public boolean initiateConnection() {
 		boolean connectionSuccessful = false;
 		try{
-			requestSocket = new Socket(this.host,this.port);
+			requestSocket = new Socket();
+			requestSocket.connect(new InetSocketAddress(this.host,this.port), 5000);
 			logger.info(new StringBuilder("Connected to -->").append(host).append(",").append(port));
 			connectionSuccessful = true;
 		}

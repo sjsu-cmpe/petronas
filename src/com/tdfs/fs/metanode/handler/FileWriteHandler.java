@@ -49,13 +49,14 @@ public class FileWriteHandler extends AbstractEventListener{
 	/**
 	 */
 	FSMetadata metadata = null;
+	InetSocketAddress chunkNodeAddress = null;
 	
 	private static Logger logger = Logger.getLogger(FileWriteHandler.class);
 	
 	public FileWriteHandler() {
 		
 		metadata = FSMetadata.getInstance();
-		chunksToTransfer = Collections.synchronizedList(new ArrayList<Chunk>());
+		
 	}
 
 	
@@ -68,7 +69,11 @@ public class FileWriteHandler extends AbstractEventListener{
 		{
 			if(((DataPacket<?>) arg1).getPacketType() == PacketType.FILE_WRITE)
 			{
-				if(metadata.getAvailableChunkNode() != null)
+				if(this.file == null)
+				{
+					this.chunkNodeAddress = metadata.getAvailableChunkNode();
+				}
+				if(this.chunkNodeAddress != null)
 				{
 					this.fileDataPacket = (FileWriteDataPacket) arg1;
 					createDirectoryStructure(this.fileDataPacket.getFileName(), this.fileDataPacket.isDirectory());
@@ -117,7 +122,7 @@ public class FileWriteHandler extends AbstractEventListener{
 		if(file == null)
 		{
 			chunkNames = new LinkedList<String>();
-			
+			chunksToTransfer = Collections.synchronizedList(new ArrayList<Chunk>());
 			
 			file = new INode(fileName);
 			file.setChecksum(fileDataPacket.getCheckSum());
@@ -148,6 +153,8 @@ public class FileWriteHandler extends AbstractEventListener{
 			sendChunks();
 			file = null;
 			chunkNames = null;
+			chunksToTransfer = null;
+			chunkNodeAddress = null;
 			
 		}
 		
@@ -222,7 +229,7 @@ public class FileWriteHandler extends AbstractEventListener{
 		Iterator<Chunk> iterator = chunksToTransfer.iterator();
 		ExecutorService executorPool = Executors.newFixedThreadPool(6);
 		Set<Future<DataPacket<?>>> responseSet = new HashSet<Future<DataPacket<?>>>();
-		InetSocketAddress chunkNodeAddress = metadata.getAvailableChunkNode();
+		
 		while(iterator.hasNext())
 		{
 			Chunk chunk = iterator.next();

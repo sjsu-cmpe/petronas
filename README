@@ -1,0 +1,21 @@
+Starting MetaNode
+
+java -cp .:TDFS-1.0-beta.jar:log4j-1.2.16.jar com.tdfs.fs.metanode.MetaNode
+
+
+Starting ChunkNode
+
+java -cp .:TDFS-1.0-beta.jar:log4j-1.2.16.jar com.tdfs.fs.chunknode.ChunkNode
+
+
+Local Client usage
+
+java -cp .:TDFS-1.0-beta.jar:log4j-1.2.16.jar com.tdfs.fs.DistributedFileSystem --move /home/gisripa/dfs-testdata/music1.mp3 gisripa/music/music1.mp3
+
+java -cp .:TDFS-1.0-beta.jar:log4j-1.2.16.jar com.tdfs.fs.DistributedFileSystem --read gisripa/music/music1.mp3
+
+
+
+Please refer to https://github.com/gisripa/petronas  for updated code and configurations.
+
+

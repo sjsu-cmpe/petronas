@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import com.tdfs.fs.chunknode.element.ChunkMetadata;
 import com.tdfs.fs.chunknode.handler.ChunkReadHandler;
+import com.tdfs.fs.chunknode.handler.ChunkRemoveHandler;
 import com.tdfs.fs.chunknode.handler.ChunkWriteHandler;
 import com.tdfs.fs.chunknode.handler.PingHandler;
 import com.tdfs.fs.io.DiskPersistence;
@@ -46,6 +47,8 @@ public class ChunkNode extends AbstractServer{
 	 */
 	private ChunkReadHandler chunkReadHandler = null;
 	
+	private ChunkRemoveHandler chunkRemoveHandler = null;
+	
 	private PingHandler pingHandler = null;
 	/**
 	 */
@@ -69,7 +72,13 @@ public class ChunkNode extends AbstractServer{
 	{
 		chunkInfo = ChunkMetadata.getInstance();
 		registerEventHandlers();
-		registerWithMetaNode();
+		try {
+			registerWithMetaNode();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			logger.error("registration with MetaNode failed",e);
+			System.exit(0);
+		}
 		scheduler = new ChunkdataSnapshot(3000, 3000);
 	}
 	
@@ -79,10 +88,12 @@ public class ChunkNode extends AbstractServer{
 		this.dataEvent = new DataEvent();
 		this.chunkWriteHandler = new ChunkWriteHandler();
 		this.chunkReadHandler = new ChunkReadHandler();
+		this.chunkRemoveHandler = new ChunkRemoveHandler();
 		this.pingHandler = new PingHandler();
 		this.dataEvent.addObserver(this.chunkWriteHandler);
 		this.dataEvent.addObserver(chunkReadHandler);
 		this.dataEvent.addObserver(pingHandler);
+		this.dataEvent.addObserver(chunkRemoveHandler);
 	}
 	
 		
@@ -94,7 +105,7 @@ public class ChunkNode extends AbstractServer{
 	}
 	
 	
-	private void registerWithMetaNode()
+	private void registerWithMetaNode() throws Exception
 	{
 	
 		// TODO: First register with meta node and then send chunks
@@ -102,10 +113,13 @@ public class ChunkNode extends AbstractServer{
 		
 		try{
 			ExecutorService pool = Executors.newFixedThreadPool(2);
-			AbstractClient client = new ChunkClient(InetAddress.getByName("localhost"), 9090, 
+			AbstractClient client = new ChunkClient(ResourceLoader.getMetaNodeAddress().getAddress(), ResourceLoader.getMetaNodeAddress().getPort(), 
 			new DataPacket<Set<String>>(PacketType.CHUNKNODE_REGISTER, chunkInfo.getChunkList(), System.currentTimeMillis(),
 					ResourceLoader.getLocalChunkNodeAddress()));
-			client.initiateConnection();
+			if(!client.initiateConnection())
+			{
+				throw new Exception("Connection failed to connect to Metanode");
+			}
 			Future<DataPacket<?>> future = pool.submit(client);
 			DataPacket<?> dataPacket = future.get();
 			if(dataPacket != null)
@@ -133,7 +147,7 @@ public class ChunkNode extends AbstractServer{
 	public static void main(String[] args)
 	{
 		try{
-			
+			ResourceLoader.loadConfigurations();
 			ChunkNode server = new ChunkNode(ResourceLoader.getLocalChunkNodeAddress().getAddress(),ResourceLoader.getLocalChunkNodeAddress().getPort());
 			new Thread((AbstractServer)server).start();
 						

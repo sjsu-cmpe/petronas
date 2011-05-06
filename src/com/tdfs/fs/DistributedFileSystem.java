@@ -69,7 +69,7 @@ public class DistributedFileSystem extends AbstractClient implements FileSystem{
 			file = new File(localFilePath);
 			localInputStream = new FileInputStream(file);
 			int fileSize = (int) file.length();
-			int readLength = ResourceLoader.getBlockSize();
+			int readLength = (int) ResourceLoader.getBlockSize();
 
 			while (fileSize > 0) {
 				if (fileSize <= readLength) {
@@ -237,23 +237,40 @@ public class DistributedFileSystem extends AbstractClient implements FileSystem{
 
 	public static void main(String... args)
 	{
+		ResourceLoader.loadConfigurations();
 		try {
-			final DistributedFileSystem localClient = new DistributedFileSystem(InetAddress.getByName("localhost"), 9090);
-			//localClient.move("/home/gisripa/dfs-testdata/music2.mp3","gisripa/music/music2.mp3");
-			/*new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					localClient.move("/home/gisripa/dfs-testdata/music1.mp3","gisripa/music/music1.mp3");
-					
-				}
-			}
-					).start();*/
-			localClient.read("music2.mp3");
+			final DistributedFileSystem localClient = new DistributedFileSystem(ResourceLoader.getMetaNodeAddress().getAddress(),
+					ResourceLoader.getMetaNodeAddress().getPort());
+			//long starttime = System.currentTimeMillis();
+			//localClient.move("/home/gisripa/dfs-testdata/music1.mp3","gisripa/music/music1.mp3");
+						
+			//localClient.read("music2.mp3");
+			
 			//localClient.read("movie.wmv");
 			//localClient.mkdir("/songs/ladygaga/2001");
-
-		} catch (UnknownHostException e) {
+			//long endtime = System.currentTimeMillis();
+			//System.out.println((endtime-starttime)/1000+" seconds");
+			
+			if(args.length < 0)
+			{
+				throw new IllegalArgumentException("Specify arguments for DFS operations");
+			}
+			else{
+				if(args[0].equals("--read"))
+				{
+					localClient.read(args[1]);
+				}
+				else if(args[0].equals("--move"))
+				{
+					localClient.move(args[1],args[2]);
+				}
+			}
+		}
+		catch(NullPointerException npe)
+		{
+			System.out.println("Error occurred in parsing arguments");
+		}
+		catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

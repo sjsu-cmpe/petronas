@@ -36,6 +36,7 @@ public enum PacketType {
 	CHUNKNODE_REGISTER("First packet from chunknode for registration",10),
 	/**
 	 */
+	CHUNK_REMOVE("Remove chunks from disk",11),
 	ERROR("Error",19);
 	
 	private int packetType;
